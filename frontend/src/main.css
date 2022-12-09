@@ -30,11 +30,21 @@ p {
 }
 
 .header {
+    position: relative;
     background: #000;
     color: #fff;
     padding: 8px 16px;
 
     flex: 0 0 auto;
+}
+
+.header>.timer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .header>h1 {
