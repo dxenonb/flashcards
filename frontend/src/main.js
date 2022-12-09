@@ -5,10 +5,20 @@ class App {
         this.timerStart = new Date();
 
         const timerSeconds = 10 * 60;
+        new Round(document.querySelector('#round-page'));
 
-        setInterval(() => {
+        const renderTimeTick = () => {
             document.querySelector('#timer').textContent = renderTime(this.timerStart, timerSeconds);
-        }, 1000);
+        };
+        setInterval(renderTimeTick, 1000);
+    }
+}
+
+class Round {
+    constructor(roundPageEl) {
+        this.el = roundPageEl;
+
+        this.el.appendChild(initFlashcard());
     }
 }
 
@@ -18,6 +28,20 @@ function renderTime(timerStart, timerSeconds) {
     const minutesRem = Math.floor(rem / 60).toString().padStart(1, '0');
     const secondsRem = Math.floor(rem % 60).toString().padStart(2, '0');
     return `${minutesRem}:${secondsRem}`;
+}
+
+// function renderFlashcard(cardEl) {
+
+// }
+
+function initFlashcard() {
+    const cardEl = document.createElement('div');
+    cardEl.classList.add('flashcard');
+
+    const span = document.createElement('span');
+    cardEl.appendChild(span);
+
+    return cardEl;
 }
 
 await russianTestSet();
