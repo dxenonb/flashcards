@@ -15,8 +15,8 @@ class App {
 function renderTime(timerStart, timerSeconds) {
     const endTime = timerStart.valueOf() + timerSeconds * 1000;
     const rem = (endTime - new Date().valueOf()) / 1000;
-    const minutesRem = Math.floor(rem / 60);
-    const secondsRem = Math.floor(rem % 60);
+    const minutesRem = Math.floor(rem / 60).toString().padStart(1, '0');
+    const secondsRem = Math.floor(rem % 60).toString().padStart(2, '0');
     return `${minutesRem}:${secondsRem}`;
 }
 
