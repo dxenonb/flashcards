@@ -17,7 +17,7 @@ p {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .space-x-lg *:not(:last-child) {
@@ -84,7 +84,7 @@ p {
 }
 
 .flashcard:not(.dragging) {
-    transition: transform 0.2s ease-in;
+    transition: transform 0.4s ease-in;
 }
 
 .flashcard.left {

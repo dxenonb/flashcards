@@ -18,7 +18,56 @@ class Round {
     constructor(roundPageEl) {
         this.el = roundPageEl;
 
-        this.el.appendChild(initFlashcardFront());
+        this.frontCard = initFlashcardFront(() => {
+            this.handleFlipFront();
+        });
+        this.rearCard = initFlashcardBack(
+            (delayMs) => { this.handleRejectBack(Math.min(delayMs, 1000)); },
+            (delayMs) => { this.handleAcceptBack(Math.min(delayMs, 1000)); },
+        );
+
+        this.el.appendChild(this.frontCard);
+        this.el.appendChild(this.rearCard);
+
+        this.rearCard.classList.add('hidden');
+
+        this.handleBackTimeout = null;
+    }
+
+    handleFlipFront() {
+        this.frontCard.classList.add('hidden');
+        this.rearCard.classList.remove('hidden');
+    }
+
+    handleRejectBack(delay) {
+        if (this.handleBackTimeout !== null) {
+            clearTimeout(this.handleBackTimeout);
+        }
+        this.handleBackTimeout = setTimeout(() => {
+            this.nextEntry();
+        }, delay);
+    }
+
+    handleAcceptBack(delay) {
+        if (this.handleBackTimeout !== null) {
+            clearTimeout(this.handleBackTimeout);
+        }
+        this.handleBackTimeout = setTimeout(() => {
+            this.nextEntry();
+        }, delay);
+    }
+
+    nextEntry() {
+        this.rearCard.classList.add('hidden');
+        this.rearCard.classList.remove('left', 'right');
+
+        this.frontCard.classList.remove('hidden');
+    }
+
+    destroy() {
+        if (this.handleBackTimeout !== null) {
+            clearTimeout(this.handleBackTimeout);
+        }
     }
 }
 
@@ -73,7 +122,9 @@ function initFlashcardFront(onFlipped) {
 
             // check if the card was rejected or accepted
             if (flip < -fullFlipThreshold || flip > fullFlipThreshold) {
-                cardEl.classList.add('flipped');
+                if (onFlipped) {
+                    onFlipped();
+                }
             }
 
             dragDownPx = 0;
@@ -93,6 +144,16 @@ function initFlashcardBack(onRejected, onAccepted) {
 
     const span = document.createElement('span');
     cardEl.appendChild(span);
+
+    const handleCb = (cb) => {
+        // need to wait a cycle for transition info to become available
+        // (due to the removal of the drag class)
+        // TODO: this isn't perfect
+        setTimeout(() => {
+            const duration = extractTotalTransitionDuration(cardEl);
+            cb(duration);
+        }, 0);
+    };
 
     let dragLeftPx = 0;
     let dragDownPx = 0;
@@ -125,8 +186,14 @@ function initFlashcardBack(onRejected, onAccepted) {
             // check if the card was rejected or accepted
             if (dragLeftPx < -400) {
                 cardEl.classList.add('left');
+                if (onAccepted) {
+                    handleCb(onAccepted);
+                }
             } else if (dragLeftPx > 400) {
                 cardEl.classList.add('right');
+                if (onRejected) {
+                    handleCb(onRejected);
+                }
             }
 
             dragLeftPx = 0;
@@ -139,6 +206,20 @@ function initFlashcardBack(onRejected, onAccepted) {
     document.addEventListener('mouseup', stopDrag);
 
     return cardEl;
+}
+
+/**
+ * Returns the result in MS.
+ * 
+ * Currently assume duration/delay are specified in seconds.
+ */
+function extractTotalTransitionDuration(el) {
+    // TODO: handle more general units (ms)
+    const style = getComputedStyle(el);
+    const duration = parseFloat(style.transitionDuration.replace('s', ''));
+    const delay = parseFloat(style.transitionDelay.replace('s', ''));
+    console.log('determined duration:', (duration + delay) * 1000);
+    return (duration + delay) * 1000;
 }
 
 await russianTestSet();
