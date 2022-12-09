@@ -1,22 +1,31 @@
-import { russianTestSet } from "./modules/db.js";
+import { initialize, russianTestSet, Entry } from "./modules/db.js";
 
 class App {
-    constructor() {
-        this.timerStart = new Date();
+    constructor(db) {
+        this.db = db;
+    }
 
-        const timerSeconds = 10 * 60;
-        new Round(document.querySelector('#round-page'));
+    async startRound() {
+        const entries = await Entry.getAll(this.db);
 
-        const renderTimeTick = () => {
-            document.querySelector('#timer').textContent = renderTime(this.timerStart, timerSeconds);
-        };
-        setInterval(renderTimeTick, 1000);
+        new Round(
+            document.querySelector('#timer'),
+            document.querySelector('#round-page'),
+            10 * 60,
+            entries,
+        );
     }
 }
 
 class Round {
-    constructor(roundPageEl) {
+    constructor(timerEl, roundPageEl, roundDurationSeconds, entries) {
         this.el = roundPageEl;
+        // TODO: need to empty the element
+
+        this.entries = entries;
+        this.index = 0;
+
+        this.handleBackTimeout = null;
 
         this.frontCard = initFlashcardFront(() => {
             this.handleFlipFront();
@@ -31,7 +40,21 @@ class Round {
 
         this.rearCard.classList.add('hidden');
 
-        this.handleBackTimeout = null;
+        this.timerStart = new Date();
+        this.roundDuration = roundDurationSeconds;
+        const renderTimeTick = () => {
+            timerEl.textContent = renderTime(this.timerStart, this.roundDuration);
+        };
+        renderTimeTick();
+        this.timerInterval = setInterval(renderTimeTick, 1000);
+
+        this.renderCardFront();
+    }
+
+    renderCardFront() {
+        const entry = this.entries[this.index];
+        this.frontCard.setAttribute('lang', entry.language);
+        this.frontCard.querySelector('span').textContent = entry.contents;
     }
 
     handleFlipFront() {
@@ -58,15 +81,22 @@ class Round {
     }
 
     nextEntry() {
+        this.index = (this.index + 1) % this.entries.length;
+
         this.rearCard.classList.add('hidden');
         this.rearCard.classList.remove('left', 'right');
 
         this.frontCard.classList.remove('hidden');
+
+        this.renderCardFront();
     }
 
     destroy() {
         if (this.handleBackTimeout !== null) {
             clearTimeout(this.handleBackTimeout);
+        }
+        if (this.timerInterval !== null) {
+            clearInterval(this.timerInterval);
         }
     }
 }
@@ -223,4 +253,9 @@ function extractTotalTransitionDuration(el) {
 }
 
 await russianTestSet();
-new App();
+const db = await initialize();
+
+let app;
+document.flashcardApp = app = new App(db);
+
+await app.startRound();

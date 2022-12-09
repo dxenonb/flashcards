@@ -8,6 +8,24 @@ const CURRENT_VERSION = 202212000;
 document.nanoidExposed = nanoid;
 
 export class Entry {
+    static async getAll(db) {
+        const results = await db.getAll(ENTRY_STORE);
+        return results.map(e => Entry.fromRecord(e));
+    }
+
+    static fromRecord(record) {
+        const entry = new Entry(record.language, record.contents, record.transactions);
+
+        entry._id = record.id;
+        entry._partOfSpeech = record.partOfSpeech;
+        entry._synonyms = record.synonyms;
+        entry._contexts = record.contexts;
+        entry._note = record.note;
+        entry._lastModified = record.lastModified;
+
+        return entry;
+    }
+
     constructor(language, contents, translations) {
         this._id = nanoid(21);
         this._language = language;
@@ -28,6 +46,14 @@ export class Entry {
         this._contexts = [];
         this._note = '';
         this._lastModified = new Date();
+    }
+
+    get language() {
+        return this._language;
+    }
+
+    get contents() {
+        return this._contents;
     }
 
     partOfSpeech(pos) {
