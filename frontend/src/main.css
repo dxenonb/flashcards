@@ -16,6 +16,10 @@ p {
     font-weight: normal;
 }
 
+.hidden {
+    display: none;
+}
+
 .space-x-lg *:not(:last-child) {
     margin-right: 16px;
 }
@@ -76,4 +80,17 @@ p {
     align-items: center;
 
     font-size: 1.25rem;
+    transform: translate(0, 0);
+}
+
+.flashcard:not(.dragging) {
+    transition: transform 0.2s ease-in;
+}
+
+.flashcard.left {
+    transform: translate(-100vw, 0) !important;
+}
+
+.flashcard.right {
+    transform: translate(100vw, 0) !important;
 }
