@@ -103,14 +103,14 @@ p {
     overflow-y: scroll;
 }
 
+.entries h2 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+}
+
 .entries-form-container {
     padding: 16px;
     border-bottom: 1px solid black;
-}
-
-.entries-form-container>h2 {
-    font-size: 1.25rem;
-    margin-bottom: 12px;
 }
 
 .entries-form {
@@ -156,8 +156,39 @@ p {
 .entries-list li {
     padding: 8px 16px;
     list-style-type: none;
+    cursor: pointer;
+
+    transition: background 0.2s ease-in-out;
+    background-color: rgba(0, 0, 0, 0.0);
+}
+
+.entries-list li:hover {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .entries-list li:not(:last-child) {
     border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.entries-list li .language {
+    padding: 2px;
+    margin-right: 4px;
+    background: rgba(0, 0, 0, 0.2);
+
+    font-size: 0.8rem;
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.8);
+
+    border-radius: 4px;
+}
+
+.entries-list li .contents {
+    font-size: 1.25rem;
+}
+
+.entries-list li .translations {
+    margin-left: 20px;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.6);
 }

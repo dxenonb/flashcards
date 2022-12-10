@@ -1,19 +1,25 @@
-import { initialize, russianTestSet, Entry } from "./modules/db.js";
+import { initialize, russianTestSet } from "./modules/db.js";
+import { EditScreen } from './modules/edit-screen.js';
 
 class App {
     constructor(db) {
         this.db = db;
     }
 
-    async startRound() {
-        const entries = await Entry.getAll(this.db);
+    async editScreen() {
+        const screen = new EditScreen(this.db, document.querySelector('.entries'));
+        await screen.showEntryList();
+    }
 
-        new Round(
-            document.querySelector('#timer'),
-            document.querySelector('#round-page'),
-            10 * 60,
-            entries,
-        );
+    async startRound() {
+        // const entries = await Entry.getAll(this.db);
+        // 
+        // new Round(
+        //     document.querySelector('#timer'),
+        //     document.querySelector('#round-page'),
+        //     10 * 60,
+        //     entries,
+        // );
     }
 }
 
@@ -292,3 +298,4 @@ let app;
 document.flashcardApp = app = new App(db);
 
 // await app.startRound();
+await app.editScreen();
