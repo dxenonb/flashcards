@@ -57,9 +57,19 @@ class Round {
         this.frontCard.querySelector('span').textContent = entry.contents;
     }
 
+    renderCardBack() {
+        const entry = this.entries[this.index];
+        // TODO: oops - need to store translation language
+        this.rearCard.setAttribute('lang', 'en');
+        // TODO: need to format this locale-appropriate
+        this.rearCard.querySelector('span').textContent = entry.translations.join(', ');
+    }
+
     handleFlipFront() {
         this.frontCard.classList.add('hidden');
         this.rearCard.classList.remove('hidden');
+
+        this.renderCardBack();
     }
 
     handleRejectBack(delay) {
@@ -125,7 +135,7 @@ function initFlashcardFront(onFlipped) {
     let dragDownPx = 0;
     const handleMove = (event) => {
         if (dragging) {
-            dragDownPx = event.pageY - originY;
+            dragDownPx = pageY(event) - originY;
             requestAnimationFrame(() => {
                 const flip = Math.max(Math.min(dragDownPx / fullFlipPx, 1.0), -1.0);
                 const flipAngle = flip * 180;
@@ -138,11 +148,13 @@ function initFlashcardFront(onFlipped) {
     let originY = 0;
     const startDrag = (event) => {
         dragging = true;
-        originY = event.pageY;
+        originY = pageY(event);
         cardEl.classList.add('dragging');
         document.addEventListener('mousemove', handleMove);
+        document.addEventListener('touchmove', handleMove);
     };
     cardEl.addEventListener('mousedown', startDrag);
+    cardEl.addEventListener('touchstart', startDrag);
 
     const stopDrag = () => {
         if (dragging) {
@@ -161,9 +173,11 @@ function initFlashcardFront(onFlipped) {
             cardEl.style.transform = `rotateX(0deg)`;
             cardEl.classList.remove('dragging');
             document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('touchmove', handleMove);
         }
     };
     document.addEventListener('mouseup', stopDrag);
+    document.addEventListener('touchend', stopDrag);
 
     return cardEl;
 }
@@ -189,8 +203,8 @@ function initFlashcardBack(onRejected, onAccepted) {
     let dragDownPx = 0;
     const handleMove = (event) => {
         if (dragging) {
-            dragLeftPx = event.pageX - originX;
-            dragDownPx = event.pageY - originY;
+            dragLeftPx = pageX(event) - originX;
+            dragDownPx = pageY(event) - originY;
             requestAnimationFrame(() => {
                 cardEl.style.transform = `translate(${dragLeftPx}px, ${dragDownPx}px)`;
             });
@@ -202,24 +216,26 @@ function initFlashcardBack(onRejected, onAccepted) {
     let originY = 0;
     const startDrag = (event) => {
         dragging = true;
-        originX = event.pageX;
-        originY = event.pageY;
+        originX = pageX(event);
+        originY = pageY(event);
         cardEl.classList.add('dragging');
         document.addEventListener('mousemove', handleMove);
+        document.addEventListener('touchmove', handleMove);
     };
     cardEl.addEventListener('mousedown', startDrag);
+    cardEl.addEventListener('touchstart', startDrag);
 
     const stopDrag = () => {
         if (dragging) {
             dragging = false;
 
             // check if the card was rejected or accepted
-            if (dragLeftPx < -400) {
+            if (dragLeftPx < -100) {
                 cardEl.classList.add('left');
                 if (onAccepted) {
                     handleCb(onAccepted);
                 }
-            } else if (dragLeftPx > 400) {
+            } else if (dragLeftPx > 100) {
                 cardEl.classList.add('right');
                 if (onRejected) {
                     handleCb(onRejected);
@@ -231,11 +247,29 @@ function initFlashcardBack(onRejected, onAccepted) {
             cardEl.style.transform = `translate(0)`;
             cardEl.classList.remove('dragging');
             document.removeEventListener('mousemove', handleMove);
+            document.removeEventListener('touchmove', handleMove);
         }
     };
     document.addEventListener('mouseup', stopDrag);
+    document.addEventListener('touchend', stopDrag);
 
     return cardEl;
+}
+
+function pageX(event) {
+    if (event.type.toLowerCase().startsWith('mouse')) {
+        return event.pageX;
+    } else {
+        return event.touches[0].pageX;
+    }
+}
+
+function pageY(event) {
+    if (event.type.toLowerCase().startsWith('mouse')) {
+        return event.pageY;
+    } else {
+        return event.touches[0].pageY;
+    }
 }
 
 /**
@@ -248,7 +282,6 @@ function extractTotalTransitionDuration(el) {
     const style = getComputedStyle(el);
     const duration = parseFloat(style.transitionDuration.replace('s', ''));
     const delay = parseFloat(style.transitionDelay.replace('s', ''));
-    console.log('determined duration:', (duration + delay) * 1000);
     return (duration + delay) * 1000;
 }
 

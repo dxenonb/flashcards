@@ -14,7 +14,7 @@ export class Entry {
     }
 
     static fromRecord(record) {
-        const entry = new Entry(record.language, record.contents, record.transactions);
+        const entry = new Entry(record.language, record.contents, record.translations);
 
         entry._id = record.id;
         entry._partOfSpeech = record.partOfSpeech;
@@ -54,6 +54,10 @@ export class Entry {
 
     get contents() {
         return this._contents;
+    }
+
+    get translations() {
+        return this._translations;
     }
 
     partOfSpeech(pos) {
