@@ -2,7 +2,7 @@ import { openDB, deleteDB } from 'https://cdn.jsdelivr.net/npm/idb@7/+esm';
 import { nanoid } from 'https://cdn.jsdelivr.net/npm/nanoid/nanoid.js';
 
 const DB_NAME = 'flashcards';
-const ENTRY_STORE = 'entry';
+export const ENTRY_STORE = 'entry';
 const CURRENT_VERSION = 202212000;
 
 document.nanoidExposed = nanoid;
@@ -14,8 +14,14 @@ export class Entry {
     }
 
     static async get(db, id) {
-        const e = await db.get(ENTRY_STORE, id);
-        return Entry.fromRecord(e);
+        if (db instanceof IDBDatabase) {
+            const e = await db.get(ENTRY_STORE, id);
+            return Entry.fromRecord(e);
+        } else {
+            // assume it's actually a transaction
+            const e = await db.objectStore(ENTRY_STORE).get(id);
+            return Entry.fromRecord(e);
+        }
     }
 
     static fromRecord(record) {
@@ -139,7 +145,7 @@ export class Entry {
     }
 
     _modify() {
-        this.lastModified = new Date();
+        this._lastModified = new Date();
     }
 }
 
@@ -159,9 +165,19 @@ export async function initialize() {
 }
 
 export async function russianTestSet() {
-    await deleteDB(DB_NAME);
+    document.deleteDB = () => {
+        return deleteDB(DB_NAME);
+    };
+
     const db = await initialize();
     const tx = entryTxRw(db);
+
+    if ((await Entry.getAll(db)).length > 0) {
+        console.log('skipping initializing database');
+        return;
+    } else {
+        console.log('initializing database');
+    }
 
     let entry;
 
