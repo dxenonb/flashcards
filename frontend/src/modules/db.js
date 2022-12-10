@@ -13,6 +13,11 @@ export class Entry {
         return results.map(e => Entry.fromRecord(e));
     }
 
+    static async get(db, id) {
+        const e = await db.get(ENTRY_STORE, id);
+        return Entry.fromRecord(e);
+    }
+
     static fromRecord(record) {
         const entry = new Entry(record.language, record.contents, record.translations);
 
@@ -48,6 +53,10 @@ export class Entry {
         this._lastModified = new Date();
     }
 
+    get id() {
+        return this._id;
+    }
+
     get language() {
         return this._language;
     }
@@ -56,8 +65,16 @@ export class Entry {
         return this._contents;
     }
 
+    get contexts() {
+        return this._contexts;
+    }
+
     get translations() {
         return this._translations;
+    }
+
+    get synonyms() {
+        return this._synonyms;
     }
 
     partOfSpeech(pos) {
