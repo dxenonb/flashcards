@@ -20,7 +20,7 @@ p {
     display: none !important;
 }
 
-.space-x-lg *:not(:last-child) {
+.space-y-md *:not(:last-child) {
     margin-right: 16px;
 }
 
@@ -29,8 +29,6 @@ p {
     flex-flow: column nowrap;
 
     height: 100%;
-
-    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(235, 239, 241, 1) 100%);
 }
 
 .header {
@@ -61,6 +59,8 @@ p {
     flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
+
+    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(235, 239, 241, 1) 100%);
 
     flex: 1 1 auto;
 
@@ -95,4 +95,69 @@ p {
 
 .flashcard.right {
     transform: translate(100vw, 0) !important;
+}
+
+.entries {
+    flex: 1 1 auto;
+
+    overflow-y: scroll;
+}
+
+.entries-form-container {
+    padding: 16px;
+    border-bottom: 1px solid black;
+}
+
+.entries-form-container>h2 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+}
+
+.entries-form {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 16px;
+}
+
+.entries-form>div {
+    flex: 1 1 0;
+}
+
+.entries-form>div>div:not(:last-child) {
+    margin-bottom: 8px;
+}
+
+.entries-form label:not(:last-child) {
+    display: block;
+}
+
+.entries-form textarea,
+.entries-form input {
+    display: block;
+    width: 100%;
+}
+
+.entries-list-container {
+    padding: 16px;
+}
+
+.entries-list-container>h2 {
+    margin-bottom: 16px;
+}
+
+.entries-list {
+    margin: 0 -16px 0 -16px;
+    padding: 0;
+
+    border-top: 1px solid rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.entries-list li {
+    padding: 8px 16px;
+    list-style-type: none;
+}
+
+.entries-list li:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }

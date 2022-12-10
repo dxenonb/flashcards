@@ -19,7 +19,72 @@
             <div id="timer" class="timer"></div>
         </header>
 
-        <section id="round-page" class="flashcard-container">
+        <section id="round-page" class="flashcard-container hidden">
+        </section>
+
+        <section id="entries-page" class="entries">
+            <div class="entries-form-container">
+                <h2>Edit Entry</h2>
+
+                <form action="" class="entries-form">
+                    <div>
+
+                        <div>
+                            <label for="language">Language</label>
+                            <input id="language" type="text">
+                        </div>
+
+                        <div>
+                            <label for="contents">Contents</label>
+                            <input id="contents" type="text">
+                        </div>
+
+                        <div>
+                            <label for="translations">Translations</label>
+                            <textarea name="translations" id="translations" cols="30" rows="5"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <div>
+                            <label for="part-of-speech">Part of Speech</label>
+                            <input id="part-of-speech" type="text">
+                        </div>
+
+                        <div>
+                            <label for="synonyms">Synonyms</label>
+                            <textarea name="synonyms" id="synonyms" cols="30" rows="5"></textarea>
+                        </div>
+
+                        <div>
+                            <label for="contexts">Contexts</label>
+                            <textarea name="contexts" id="contexts" cols="30" rows="5"></textarea>
+                        </div>
+
+                        <div>
+                            <label for="note">Note</label>
+                            <textarea name="note" id="note" cols="30" rows="5"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="hidden">Save</button>
+                </form>
+            </div>
+            <div class="entries-list-container">
+                <h2>Select Entry</h2>
+                <ul class="entries-list">
+                    <li>
+                        <span class="language">RU</span>
+                        <span class="contents">опять</span>
+                        <div>
+                            <span class="translations">again, more</span>
+                        </div>
+                    </li>
+                    <li>снова</li>
+                </ul>
+            </div>
         </section>
     </div>
 </body>

@@ -291,4 +291,4 @@ const db = await initialize();
 let app;
 document.flashcardApp = app = new App(db);
 
-await app.startRound();
+// await app.startRound();
