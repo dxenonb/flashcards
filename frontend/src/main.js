@@ -7,7 +7,7 @@ class App {
     }
 
     async editScreen() {
-        const screen = new EditScreen(this.db, document.querySelector('.entries'));
+        const screen = new EditScreen(this.db, document.querySelector('#entries-page'));
         await screen.showEntryList();
     }
 
@@ -123,10 +123,6 @@ function renderTime(timerStart, timerSeconds) {
     const minutesRem = Math.floor(rem / 60).toString().padStart(1, '0');
     const secondsRem = Math.floor(rem % 60).toString().padStart(2, '0');
     return `${minutesRem}:${secondsRem}`;
-}
-
-function renderFlashcard(cardEl) {
-
 }
 
 function initFlashcardFront(onFlipped) {

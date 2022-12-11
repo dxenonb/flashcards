@@ -25,6 +25,10 @@ export class EditScreen {
             if (!entryId) {
                 return;
             }
+            if (entryId === 'new') {
+                this.newEntry();
+                return;
+            }
             this.editEntry(entryId);
         };
         listCtr.addEventListener('click', this.clickEntryHandler);
@@ -109,6 +113,15 @@ export class EditScreen {
         entry._note = formCtr.querySelector('#note').value;
     }
 
+    async newEntry() {
+        const entry = new Entry(this.defaultLanguage || '', '', []);
+        // ideally we wouldn't save it, but everything is a dumpster fire 
+        // right now and editEntry requires it
+        await entry.commit(this.db);
+        await this.showEntryList();
+        this.editEntry(entry.id);
+    }
+
     async editEntry(entryId) {
         if (this.saveTimeout) {
             alert('save in progress - wait a second');
@@ -132,15 +145,37 @@ export class EditScreen {
         formCtr.querySelector('#synonyms').value = entry.synonyms.join('\n');
         formCtr.querySelector('#contexts').value = entry.contexts.map((ctx) => `${ctx.context}\n${ctx.source}`).join('\n\n');
         formCtr.querySelector('#note').value = entry.note();
+
+        formCtr.querySelector('#contents').focus();
     }
 
     async showEntryList() {
+        // TODO: pagination
         const entries = await Entry.getAll(this.db);
+
+        entries.sort((a, b) => { // yikes... use an index?
+            if (a._lastModified > b._lastModified) {
+                return -1;
+            } else if (b._lastModified > a._lastModified) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        const listEl = this.el.querySelector('.entries-list');
+        listEl.replaceChildren();
         for (const entry of entries) {
             const el = initListItem();
             renderListItem(el, entry);
-            this.el.querySelector('.entries-list').appendChild(el);
+            listEl.appendChild(el);
         }
+
+        this.defaultLanguage = entries[0].language;
+
+        const newEl = initListItem();
+        renderNewItem(newEl);
+        listEl.appendChild(newEl);
     }
 
     updateEntryList(entry) {
@@ -166,6 +201,14 @@ function renderListItem(el, entry) {
     el.querySelector('.language').textContent = entry.language;
     el.querySelector('.contents').textContent = entry.contents;
     el.querySelector('.translations').textContent = entry.translations;
+}
+
+function renderNewItem(el) {
+    el.setAttribute('data-id', 'new');
+
+    el.querySelector('.language').classList.add('hidden');
+    el.querySelector('.contents').textContent = '[add new]';
+    el.querySelector('.translations').classList.add('hidden');
 }
 
 function initListItem() {
