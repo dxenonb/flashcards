@@ -53,6 +53,23 @@ p {
     font-size: 1.5rem;
 }
 
+.header .toggle-mode {
+    position: absolute;
+    top: 50%;
+    right: 0px;
+    transform: translate(0, -50%);
+
+    padding: 8px;
+
+    color: #fff;
+    text-decoration: none;
+}
+
+.header .toggle-mode:hover,
+.header .toggle-mode:focus {
+    text-decoration: underline;
+}
+
 .flashcard-container {
     position: relative;
     display: flex;

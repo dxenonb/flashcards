@@ -214,7 +214,7 @@ export class EditScreen {
         }
     }
 
-    destory() {
+    destroy() {
         this.el.classList.add('hidden');
         this.el.querySelector('.entries-list-container').removeEventListener('click', this.clickEntryHandler);
         this.el.querySelector('.entries-form-container').removeEventListener('input', this.editEntryHandler);
