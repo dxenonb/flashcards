@@ -1,4 +1,4 @@
-import { Entry, ENTRY_STORE } from "./db.js";
+import { Entry, ENTRY_STORE, exportDb, importDb } from "./db.js";
 
 const SAVE_TIMEOUT = 1 * 1000;
 
@@ -37,6 +37,33 @@ export class EditScreen {
         this.saveTimeout = null;
         this.editEntryHandler = (event) => this.handleEditEntry(event);
         formCtr.addEventListener('input', this.editEntryHandler);
+
+        this.exportHandler = this.el.querySelector('#entries-export').addEventListener('click', async () => {
+            const blob = new Blob([await exportDb(this.db)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            const date = new Date();
+            a.download = `flashcards-export-${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        this.importHandler = this.el.querySelector('#entries-import').addEventListener('click', () => {
+            const fileInput = this.el.querySelector('#entries-import-input');
+
+            const handler = fileInput.addEventListener('input', async () => {
+                fileInput.removeEventListener('input', handler);
+
+                const contents = await readTextFile(fileInput.files[0]);
+                await importDb(db, contents);
+                await this.showEntryList();
+            });
+
+            fileInput.click();
+        });
     }
 
     handleEditEntry() {
@@ -191,6 +218,9 @@ export class EditScreen {
         this.el.classList.add('hidden');
         this.el.querySelector('.entries-list-container').removeEventListener('click', this.clickEntryHandler);
         this.el.querySelector('.entries-form-container').removeEventListener('input', this.editEntryHandler);
+
+        this.exportHandler = this.el.querySelector('#entries-export').removeEventListener('click', this.exportHandler);
+        this.importHandler = this.el.querySelector('#entries-import').addEventListener('click', this.importHandler);
     }
 
 }
@@ -229,4 +259,21 @@ function initListItem() {
     el.appendChild(subline);
 
     return el;
+}
+
+function readTextFile(file) {
+    const reader = new FileReader();
+    const result = new Promise((resolve, reject) => {
+        reader.onload = (event) => {
+            try {
+                resolve(event.target.result);
+            } catch (e) {
+                reject(e);
+            }
+        };
+
+        reader.onerror = reject;
+    });
+    reader.readAsText(file);
+    return result;
 }

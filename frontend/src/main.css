@@ -141,8 +141,19 @@ p {
     padding: 16px;
 }
 
-.entries-list-container>h2 {
+.entries-list-header {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-end;
     margin-bottom: 16px;
+}
+
+.entries-list-header>*:not(:last-child) {
+    margin-right: 8px;
+}
+
+.entries-list-header h2 {
+    margin: 0;
 }
 
 .entries-list {

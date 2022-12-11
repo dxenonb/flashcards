@@ -24,6 +24,38 @@ export class Entry {
         }
     }
 
+    static export(record) {
+        // nothing actually changes right now...
+        const {
+            id,
+            language,
+            contents,
+            translations,
+            synonyms,
+            contexts,
+            lastModified,
+            partOfSpeech,
+            note
+        } = record;
+        return {
+            id,
+            language,
+            contents,
+            translations,
+            synonyms,
+            contexts,
+            lastModified,
+            partOfSpeech,
+            note,
+        };
+    }
+
+    static import(json) {
+        // TODO: merge, stop doing stuff in place :sob:
+        json.lastModified = new Date(json.lastModified);
+        return Entry.fromRecord(json);
+    }
+
     static fromRecord(record) {
         const entry = new Entry(record.language, record.contents, record.translations);
 
@@ -71,16 +103,20 @@ export class Entry {
         return this._contents;
     }
 
-    get contexts() {
-        return this._contexts;
-    }
-
     get translations() {
         return this._translations;
     }
 
     get synonyms() {
         return this._synonyms;
+    }
+
+    get contexts() {
+        return this._contexts;
+    }
+
+    get lastModified() {
+        return this._lastModified;
     }
 
     partOfSpeech(pos) {
@@ -162,6 +198,55 @@ export async function initialize() {
         },
     });
     return db;
+}
+
+export async function importDb(db, json) {
+    const entries = await db.getAll(ENTRY_STORE);
+    const entryByContents = {};
+    for (const entry of entries) {
+        entryByContents[entry.contents] = entry.id;
+    }
+
+    let importing;
+    try {
+        importing = JSON.parse(json);
+    } catch (e) {
+        throw new Error(`Failed to parse uploaded file: ${e}`);
+    }
+
+    if (!importing.entry) {
+        throw new Error(`Expected JSON import to have top level property entry - instead found properties: ${Object.keys(importing)}`);
+    }
+
+    const promises = [];
+    for (const i of importing.entry) {
+        const existingId = entryByContents[i.contents];
+        if (existingId) {
+            console.log(`found matching records for: '${i.contents}' (${existingId})`)
+            if (db.get(ENTRY_STORE, existingId).lastModified < new Date(i.lastModified)) {
+                console.log('\toverwriting existing record (older)');
+                i.id = existingId;
+            } else {
+                console.log('\tskipping imported record (older)');
+                continue;
+            }
+        }
+        promises.push(Entry.import(i).commit(db));
+    }
+    await Promise.all(promises);
+}
+
+export async function exportDb(db) {
+    const result = {
+        entry: [],
+    };
+
+    const entries = await db.getAll(ENTRY_STORE);
+    for (const entry of entries) {
+        result.entry.push(Entry.export(entry));
+    }
+
+    return JSON.stringify(result, undefined, 2);
 }
 
 export async function russianTestSet() {

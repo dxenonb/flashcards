@@ -75,7 +75,12 @@
                 </form>
             </div>
             <div class="entries-list-container">
-                <h2>Select Entry</h2>
+                <div class="entries-list-header">
+                    <h2>Select Entry</h2>
+                    <a id="entries-export" href="#export">export</a>
+                    <a id="entries-import" href="#import">import</a>
+                    <input class="hidden" type="file" name="entries-import-input" id="entries-import-input">
+                </div>
                 <ul class="entries-list">
                     <!-- <li>
                         <span class="language">RU</span>
