@@ -13,6 +13,12 @@ export class Entry {
         return results.map(e => Entry.fromRecord(e));
     }
 
+    static async count(db) {
+        const tx = db.transaction(ENTRY_STORE, 'readonly');
+        const store = tx.objectStore(ENTRY_STORE);
+        return store.count();
+    }
+
     static async get(db, id) {
         if (db instanceof IDBDatabase) {
             const e = await db.get(ENTRY_STORE, id);

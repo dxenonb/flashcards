@@ -198,7 +198,7 @@ export class EditScreen {
             listEl.appendChild(el);
         }
 
-        this.defaultLanguage = entries[0].language;
+        this.defaultLanguage = entries[0] ? entries[0].language : 'en';
 
         const newEl = initListItem();
         renderNewItem(newEl);

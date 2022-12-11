@@ -68,5 +68,10 @@ const db = await initialize();
 let app;
 document.flashcardApp = app = new App(db);
 
-await app.startRound();
-// await app.editScreen();
+const entryCount = await Entry.count(app.db);
+
+if (entryCount > 0) {
+    await app.startRound();
+} else {
+    await app.editScreen();
+}
