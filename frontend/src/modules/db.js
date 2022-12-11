@@ -249,41 +249,6 @@ export async function exportDb(db) {
     return JSON.stringify(result, undefined, 2);
 }
 
-export async function russianTestSet() {
-    document.deleteDB = () => {
-        return deleteDB(DB_NAME);
-    };
-
-    const db = await initialize();
-    const tx = entryTxRw(db);
-
-    if ((await Entry.getAll(db)).length > 0) {
-        console.log('skipping initializing database');
-        return;
-    } else {
-        console.log('initializing database');
-    }
-
-    let entry;
-
-    entry = new Entry('ru', 'опять', ['again'])
-        .partOfSpeech('adverb')
-        .addSynonym('снова')
-        .addContext('Я с тобой опять сегодня этой ночью', 'Чайф - Пусть всё будет так, как ты захочешь ')
-        .note('can also mean again');
-    await entry.commit(db);
-
-    entry = new Entry('ru', 'снова', ['again'])
-        .addSynonym('опять');
-    await entry.commit(db);
-
-    entry = new Entry('ru', 'цвет', ['color'])
-        .addSynonym('noun');
-    await entry.commit(db);
-
-    return await tx.done;
-}
-
 function entryTxRw(dbOrTx) {
     if (dbOrTx instanceof IDBDatabase) {
         return dbOrTx.transaction([ENTRY_STORE], 'readwrite');

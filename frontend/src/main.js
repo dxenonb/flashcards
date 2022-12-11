@@ -1,4 +1,4 @@
-import { initialize, russianTestSet } from "./modules/db.js";
+import { initialize } from "./modules/db.js";
 import { EditScreen } from './modules/edit-screen.js';
 
 class App {
@@ -287,7 +287,11 @@ function extractTotalTransitionDuration(el) {
     return (duration + delay) * 1000;
 }
 
-await russianTestSet();
+// expose handy delete method
+document.deleteDb = () => {
+    return deleteDB(DB_NAME);
+};
+
 const db = await initialize();
 
 let app;
